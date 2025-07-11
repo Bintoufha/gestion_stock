@@ -136,7 +136,9 @@
 									</tr>
 								</thead>
 								<tbody>
-									<?php foreach ($dataUser as $liste_user): ?>
+									<?php
+
+									foreach ($dataUser as $liste_user): ?>
 										<tr>
 											<td>
 												<label class="checkboxs">
@@ -240,7 +242,7 @@
 											<label>Boutique</label>
 											<select class="select" name="boutique">
 												<?php
-												if (!empty($dataBoutiques)): ?>
+												if (!empty($dataBoutiques)) : ?>
 													<option>selectionner une boutique</option>
 													<?php foreach ($dataBoutiques as $Nomboutiques): ?>
 														<option value="<?= $Nomboutiques->uuidBoutique ?>">
@@ -292,10 +294,16 @@
 										<div class="input-blocks">
 											<label>Role</label>
 											<select class="select" name="role">
-												<option>selectionner</option>
-												<option value="SuperAdmin" >SuperAdmin </option>
-												<option value="Admin" >Admin</option>
-												<option value="utilisateur" >utilisateur</option>
+												<?php if (!empty($dataUser)) : ?>
+													<option>selectionner</option>
+													<?php if ($_SESSION['role'] === "SuperAdmin") : ?>
+														<option value="SuperAdmin">SuperAdmin </option>
+													<?php endif; ?>
+													<option value="Admin">Admin</option>
+													<option value="utilisateur">utilisateur</option>
+												<?php else: ?>
+													<option value="">Aucune role disponible</option>
+												<?php endif; ?>
 											</select>
 										</div>
 									</div>
@@ -355,7 +363,7 @@
 									<div class="col-lg-12">
 										<div class="input-blocks">
 											<label>Boutique</label>
-											<select class="select" name="boutique" >
+											<select class="select" name="boutique">
 												<?php
 												if (!empty($dataBoutiques)): ?>
 													<option>selectionner une boutique</option>
@@ -464,3 +472,34 @@
 </body>
 
 </html>
+
+<!-- CREATE TABLE ligne_approvisionnement (
+    uuidLigneAppro CHAR(36) PRIMARY KEY,
+    uuidApprovisionnement CHAR(36),
+    uuidArticle CHAR(36),
+    quantiteApprovisionnee INT,
+    prixUnitaireAchat DECIMAL(10,2), -- optionnel
+    FOREIGN KEY (uuidApprovisionnement) REFERENCES approvisionnements(uuidApprovisionnement),
+    FOREIGN KEY (uuidArticle) REFERENCES article(uuidArticle)
+);
+
+CREATE TABLE approvisionnements (
+    uuidApprovisionnement CHAR(36) PRIMARY KEY,
+    dateApprovisionnement DATE NOT NULL,
+    uuidFournisseur CHAR(36),       -- si fournisseur existe
+    uuidUtilisateur CHAR(36),       -- qui a fait l’entrée
+    uuidBoutique INT,               -- boutique concernée
+    commentaire TEXT,
+    created_at DATETIME DEFAULT NOW()
+);
+
+CREATE TABLE mouvements_stock (
+    uuidMouvement CHAR(36) PRIMARY KEY,
+    uuidArticle CHAR(36),
+    type ENUM('approvisionnement', 'vente', 'correction', 'transfert'),
+    quantite INT,
+    dateMouvement DATETIME DEFAULT CURRENT_TIMESTAMP,
+    origine UUID, -- uuidApprovisionnement ou autre
+    commentaire TEXT
+); -->
+

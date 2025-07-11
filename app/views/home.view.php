@@ -1,5 +1,6 @@
 <!-- header -->
- <?php $this->view("partials/header") ?>
+ <?php 
+ $this->view("partials/header") ?>
 <!-- header -->
 <body>
 	<div id="global-loader">

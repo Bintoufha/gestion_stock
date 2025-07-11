@@ -37,7 +37,7 @@
                             </div>
 
                         </div>
-                        <!-- <div class="col-lg-4 col-sm-6 col-12">
+                       <!--  <div class="col-lg-4 col-sm-6 col-12">
                             <div class="input-blocks">
                                 <label>Reference Vente</label>
                                 <input type="text" name="reference" class="text-uppercase Reference" readonly>
@@ -52,6 +52,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="col-lg-4 col-sm-6 col-12">
                             <div class="input-blocks">
                                 <label>Nom Client</label>
@@ -81,7 +82,11 @@
                                 <tr>
                                     <th>Article</th>
                                     <th>Quantite</th>
-                                    <th>Prix Engros (FCFA)</th>
+                                    <?php if ($Ventedata->typeVente === "DETAILLE"): ?>
+                                        <th>Prix Detaillants (FCFA)</th>
+                                    <?php else : ?>
+                                        <th>Prix Engros (FCFA)</th>
+                                    <?php endif ?>
                                     <th>Montant</th>
                                     <th>Operation</th>
                                 </tr>

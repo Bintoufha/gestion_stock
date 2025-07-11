@@ -262,7 +262,7 @@
                             <form method="POST">
                                 <div class="row">
                                     <div class="col-lg-12">
-                                        <input type="text" name="id" value="<?= $liste_client_fournisseurs->uuidClientFourniture ?>" class="form-control">
+                                        <input type="hidden" name="id" value="<?= $liste_client_fournisseurs->uuidClientFourniture ?>" class="form-control">
 
                                         <div class="mb-3">
                                             <label class="form-label">Nom & Prenom</label>

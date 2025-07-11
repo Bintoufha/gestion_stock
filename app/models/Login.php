@@ -17,7 +17,7 @@ class Login extends model
                 // Comparer le mot de passe de l'utilisateur
                 if (password_verify($Data['pwd'], $utilisateur->pwd)) {
                     // Stocker les informations de l'enseignant dans la session
-                    $_SESSION['uuid'] = $utilisateur->id_enseignant;
+                    $_SESSION['uuid'] = $utilisateur->uuidUtilisateurs;
                     $_SESSION['nomPrenom'] = $utilisateur->nomPrenom;
                     $_SESSION['pseudo'] = $utilisateur->pseudo;
                     $_SESSION['telephone'] = $utilisateur->telephone;

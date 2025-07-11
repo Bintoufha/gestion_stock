@@ -26,16 +26,17 @@ class Users extends Controller
         $boutique = new Boutique();
         $uuid = $_SESSION['uuidBoutique'];
         $dataBoutiques = [];
-
+        $dataUser = [];
         // Gestion des rôles
         if ($_SESSION['role'] === "SuperAdmin") {
             $dataBoutiques = $boutique->SelectAllData("*", "boutique");
-        }elseif ($_SESSION['role'] === "Admin") {
+            $dataUser = $user->SelectAllData("*", "utilisateurs");
+        } elseif ($_SESSION['role'] === "Admin") {
             $dataBoutiques = $boutique->FetchSelectWhere2("*", "boutique", "uuidBoutique=:uuid", [":uuid" => $uuid]);
-
+            $dataUser = $user->FetchSelectWhere2("*", "utilisateurs","uuidBoutique=:uuid", [":uuid" => $uuid]);
         }
         // Récupération des utilisateurs
-        $dataUser = $user->SelectAllData("*", "utilisateurs");
+
         // Rendu de la vue
         $this->view("user", [
             'dataBoutiques' => $dataBoutiques,

@@ -17,7 +17,7 @@ class Ventes extends  Controller
     $uuidBoutique = $_SESSION['uuidBoutique']; // ID de la boutique
     $timestamp = time(); // Horodatage
     $uniqueId = uniqid(); // Identifiant unique basé sur microsecondes
-    $reference = "BTQ" . $uuidBoutique . "_" . "VENTE_N°_" . $uniqueId;
+    $reference = "BTQ" . $uuidBoutique . "_" . "VENTE_CMD_N°_" . $uniqueId;
     if ($_SESSION['role'] === "SuperAdmin") {
       $dataArticle = $article->SelectAllData("*", "article");
       $dataClientFournisseur = $client->SelectAllData("*", "clientFourniture");
@@ -40,6 +40,39 @@ class Ventes extends  Controller
       'reference' => $reference,
       'dataVente' => $dataVente,
       'dataClientFournisseur' => $dataClientFournisseur
+    ]);
+  }
+  public function Liste_vente_detaillants()
+  {
+    $vente = new Vente();
+    $article = new Article();
+    $client = new ClientFournisseur();
+    $dataArticle = [];
+    $dataVente = [];
+    // Génération d'une référence unique
+    $uuidBoutique = $_SESSION['uuidBoutique']; // ID de la boutique
+    $timestamp = time(); // Horodatage
+    $uniqueId = uniqid(); // Identifiant unique basé sur microsecondes
+    $reference = "BTQ" . $uuidBoutique . "_" . "VENTE_DETAILLE_N°_" . $uniqueId;
+    if ($_SESSION['role'] === "SuperAdmin") {
+      $dataArticle = $article->SelectAllData("*", "article");
+      $dataVente = $vente->SelectAllData("*", "vente");
+    } else {
+      $dataArticle = $article->FetchSelectWhere2("*", "article", "uuidBoutique=:uuid", [':uuid' => $_SESSION['uuidBoutique']]);
+      $dataVente = $vente->FetchSelectWhere2(
+        "*",
+        "vente INNER JOIN boutique ON boutique.uuidBoutique = vente.uuidBoutique ",
+        "vente.uuidBoutique=:uuid AND vente.typeVente=:typeVente",
+        [
+          ':uuid' => $_SESSION['uuidBoutique'],
+          ':typeVente' => 'DETAILLE'
+        ]
+      );
+    }
+    $this->view("detaillantlisteVente", [
+      'dataArticle' => $dataArticle,
+      'reference' => $reference,
+      'dataVente' => $dataVente,
     ]);
   }
   public function ArticleDetails()
@@ -91,6 +124,29 @@ class Ventes extends  Controller
     $vente = new Vente();
     $Ventedata = $vente->FetchSelectWhere("*", "vente INNER JOIN clientFourniture ON clientFourniture.uuidClientFourniture = vente.uuidClientFourniture
           INNER JOIN boutique ON boutique.uuidBoutique = vente.uuidBoutique", "uuidVente=:uuid", [':uuid' => $uuid]);
+    $dataLigneVente = $vente->FetchSelectWhere2(
+      "*",
+      "ligneVente INNER JOIN article ON article.uuidArticle=ligneVente.uuidArticle",
+      "uuidVente=:uuid",
+      [':uuid' => $uuid]
+    );
+    $this->view(
+      'detailleVente',
+      [
+        'Ventedata' => $Ventedata,
+        'dataLigneVente' => $dataLigneVente
+      ]
+    );
+  }
+  public function vente_detaille($uuid)
+  {
+    $vente = new Vente();
+    $Ventedata = $vente->FetchSelectWhere(
+      "*",
+      "vente INNER JOIN boutique ON boutique.uuidBoutique = vente.uuidBoutique",
+      "uuidVente=:uuid",
+      [':uuid' => $uuid]
+    );
     $dataLigneVente = $vente->FetchSelectWhere2(
       "*",
       "ligneVente INNER JOIN article ON article.uuidArticle=ligneVente.uuidArticle",
@@ -157,7 +213,7 @@ class Ventes extends  Controller
           'uuidArticle' => $ligne->uuidArticle,
           'nomArticle' => $ligne->nomArticle,
           'quantite' => $ligne->quantite,
-          'prixEngros' => $ligne->prixEngros,
+          'prixEngrosDetaillant' => $ligne->prix_Engros_Detaillant
         ];
       }
 
@@ -221,58 +277,15 @@ class Ventes extends  Controller
       ]
     );
   }
-  // public function modifierVente()
-  // {
-  //   if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['venteData'])) {
-  //     $vente = new Vente();
-  //     $dataVente = json_decode($_POST['venteData'], true);
-  //     if (!isset($dataVente['uuidVente'])) {
-  //       http_response_code(400);
-  //       echo json_encode(['error' => 'Données invalides.']);
-  //       return;
-  //     };
-  //     // Récupère les anciens articles
-  //     $anciensArticles = $vente->FetchSelectWhere2(
-  //       "ligneVente.uuidArticle, ligneVente.quantite",
-  //       "ligneVente",
-  //       "uuidVente=:uuid",
-  //       [':uuid' => $dataVente['uuidVente']]
-  //     );
+  public function EnregistrerVenteDetaille()
+  {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['articles'])) {
+      $vente = new Vente();
+      $data = json_decode($_POST['articles'], true);
 
-  //     // Restaurer le stock des anciens articles
-  //     // foreach ($anciensArticles as $article) {
-  //     //   $vente->ajusterStockGenerique("article", "qantiteStockArticle", "uuidArticle", $article['uuidArticle'],);
-  //     // }
-  //     //$vente->modifier_vente_et_ligneVente($dataVente);
-  //   }
-  //   // // Récupère les anciens articles pour ajuster le stock
-  //   // $anciensArticles = $this->VenteModel->getArticlesParVente($uuidVente);
-
-  //   // // Restaurer le stock des anciens articles
-  //   // foreach ($anciensArticles as $article) {
-  //   //     $this->VenteModel->ajusterStock($article['uuidArticle'], $article['quantite'], 'ajouter');
-  //   // }
-
-  //   // // Supprimer les anciennes lignes
-  //   // $this->VenteModel->supprimerLignesVente($uuidVente);
-
-  //   // // Insérer les nouvelles lignes et ajuster le stock
-  //   // foreach ($articles as $article) {
-  //   //     $this->VenteModel->ajouterLigneVente($uuidVente, $article);
-  //   //     $this->VenteModel->ajusterStock($article['uuidArticle'], $article['quantite'], 'retirer');
-  //   // }
-
-  //   // // Mise à jour de la vente
-  //   // $this->VenteModel->modifierVente($uuidVente, [
-  //   //     'uuidClientFourniture' => $client,
-  //   //     'montantTotalVente' => $total,
-  //   //     'montantPayerVente' => $payer,
-  //   //     'resteVente' => $reste,
-  //   //     'rembourserVente' => $rembourser
-  //   // ]);
-
-
-  // }
+      $vente->VenteDetailleEnregistrer($data);
+    }
+  }
   public function modifierVente()
   {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -415,5 +428,77 @@ class Ventes extends  Controller
       http_response_code(405);
       echo json_encode(['error' => 'Méthode non autorisée.']);
     }
+  }
+  public function update_vente_detaille($uuid)
+  {
+    $vente = new Vente();
+    $article = new Article();
+    $client = new ClientFournisseur();
+
+    // Récupération des données
+    $dataArticle = $article->FetchSelectWhere2("*", "article", "uuidBoutique=:uuid", [
+      ':uuid' => $_SESSION['uuidBoutique']
+    ]);
+
+    $dataClientFournisseur = $client->FetchSelectWhere2("*", "clientFourniture", "uuidBoutique=:uuid", [
+      ':uuid' => $_SESSION['uuidBoutique']
+    ]);
+
+    $Ventedata = $vente->FetchSelectWhere(
+      "*",
+      "vente INNER JOIN boutique ON boutique.uuidBoutique = vente.uuidBoutique",
+      "uuidVente=:uuid",
+      [':uuid' => $uuid]
+    );
+
+    $dataLigneVente = $vente->FetchSelectWhere2(
+      "*",
+      "ligneVente 
+        INNER JOIN article ON article.uuidArticle = ligneVente.uuidArticle",
+      "uuidVente = :uuid",
+      [':uuid' => $uuid]
+    );
+
+    // Si c’est une requête AJAX, on retourne du JSON
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+
+      // Génère la vue HTML partielle (contenu du modal) via output buffering
+      ob_start();
+      $this->view('modifierVente', [ // à adapter à ton chemin réel
+        'Ventedata' => $Ventedata,
+        'dataArticle' => $dataArticle,
+        'dataClientFournisseur' => $dataClientFournisseur
+      ]);
+      $html = ob_get_clean();
+
+      // Prépare la liste d'articles pour JavaScript
+      $articles = [];
+
+      foreach ($dataLigneVente as $ligne) {
+        $articles[] = [
+          'uuidArticle' => $ligne->uuidArticle,
+          'nomArticle' => $ligne->nomArticle,
+          'quantite' => $ligne->quantite,
+          'prixEngrosDetaillant' => $ligne->prix_Engros_Detaillant,
+        ];
+      }
+
+      // Envoie la réponse JSON
+      header('Content-Type: application/json');
+      echo json_encode([
+        'view' => $html,
+        'articles' => $articles,
+        'vente' => $Ventedata
+      ]);
+      return;
+    }
+
+    // Sinon, on rend la vue classique
+    $this->view('modifierVente', [
+      'Ventedata' => $Ventedata,
+      'dataLigneVente' => $dataLigneVente,
+      'dataArticle' => $dataArticle,
+      'dataClientFournisseur' => $dataClientFournisseur
+    ]);
   }
 }

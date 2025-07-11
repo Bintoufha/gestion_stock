@@ -28,7 +28,7 @@
 				<div class="page-header">
 					<div class="add-item d-flex">
 						<div class="page-title">
-							<h4>Liste des Ventes</h4>
+							<h4>Liste des Ventes Engros</h4>
 							<h6>gerer tout vos vente</h6>
 						</div>
 					</div>
@@ -50,7 +50,7 @@
 						</li>
 					</ul>
 					<div class="page-btn">
-						<a href="#" class="btn btn-added" data-bs-toggle="modal" data-bs-target="#add-sales-new"><i data-feather="plus-circle" class="me-2"></i> Nouveau Vente</a>
+						<a href="#" class="btn btn-added" data-bs-toggle="modal" data-bs-target="#add-sales-new"><i data-feather="plus-circle" class="me-2"></i>Vente Engros</a>
 					</div>
 				</div>
 				<?php $this->view("set_flash"); ?>
@@ -159,7 +159,7 @@
 												</label>
 											</td>
 											<td><?= $liste_vente->nomPrenom ?></td>
-											<td><?= $liste_vente->referenceVente ?></td>
+											<td class="text-uppercase"><?= $liste_vente->referenceVente ?></td>
 											<!-- <td>19 Jan 2023</td> -->
 											<?php if ($liste_vente->MontantReste === 0): ?>
 												<td><span class="badge badge-bgsuccess">Complete</span></td>
@@ -178,13 +178,13 @@
 															data-id="<?= $liste_vente->uuidVente ?>"><i data-feather="eye" class="info-img">
 															</i>Detaille du vente</a>
 													</li>
-													<?php /*if ($liste_vente->MontantPayer !== 0): */ ?>
-													<?php /*else:*/ ?>
-													<li>
-														<a href="javascript:void(0);" class="dropdown-item update-sale" data-bs-toggle="modal" data-bs-target="#edit-sales-new"
-															data-id="<?= $liste_vente->uuidVente ?>"><i data-feather="edit" class="info-img"></i>Modifier vente</a>
-													</li>
-													<?php /*endif */ ?>
+													<?php if ($liste_vente->MontantReste === 0): ?>
+													<?php else: ?>
+														<li>
+															<a href="javascript:void(0);" class="dropdown-item update-sale" data-bs-toggle="modal" data-bs-target="#edit-sales-new"
+																data-id="<?= $liste_vente->uuidVente ?>"><i data-feather="edit" class="info-img"></i>Modifier vente</a>
+														</li>
+													<?php endif ?>
 													<li>
 														<a href="javascript:void(0);" class="dropdown-item view-sale-payment-historique" data-bs-toggle="modal" data-bs-target="#showpayment"
 															data-id="<?= $liste_vente->uuidVente ?>"><i data-feather="dollar-sign" class="info-img"></i>Historique paiement</a>
@@ -240,7 +240,6 @@
 												<select class="select" id="product-select">
 													<?php
 													if (!empty($dataArticle)): ?>
-														<option>selectionner un article</option>
 														<?php foreach ($dataArticle as $article): ?>
 															<option value="<?= $article->uuidArticle ?>">
 																<?= $article->nomArticle ?>- (categorie (<?= $article->categorieArticle ?>)-
@@ -616,7 +615,7 @@
 					montant_total: parseInt(montant_total),
 					clientFournisseurs: parseInt(clientFournisseurs),
 					datetimepicker: datetimepicker,
-					prixEngros:prixEngros,
+					prixEngros: prixEngros,
 					Reference: Reference
 				});
 
@@ -717,7 +716,7 @@
 							$('#ListeData').empty();
 							if (Array.isArray(data.articles)) {
 								data.articles.forEach(article => {
-									ajouterLigne(article.uuidArticle, article.nomArticle, article.prixEngros, article.quantite, true);
+									ajouterLigne(article.uuidArticle, article.nomArticle, article.prixEngrosDetaillant, article.quantite, true);
 								});
 							}
 							recalculerTotal();

@@ -83,7 +83,7 @@
 					</form>
 				</div>
 				<div class="login-img">
-					<img src="<?= ROOT ?>/assets/img/authentication/login02.png" alt="img">
+					<img src="<?= ROOT ?>/Images/img1.png" alt="img">
 				</div>
 			</div>
 		</div>

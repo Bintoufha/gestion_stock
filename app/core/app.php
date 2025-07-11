@@ -1,5 +1,9 @@
 <?php
-
+ // pour empecher l'accès direct à certaines pages sans être connecté
+  // if (!isset($_SESSION['uuid']) && $_GET['url'] !== 'login') {
+  //   header("Location: " . ROOT . "/login");
+  //   exit;
+  // }
 class App{
 
     protected $controller='Logins';

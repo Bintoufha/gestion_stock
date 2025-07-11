@@ -15,10 +15,10 @@
                     <a data-bs-toggle="tooltip" data-bs-placement="top" title="Pdf"><i data-feather="edit" class="action-edit sales-action"></i></a>
                 </li>
                 <li>
-                    <a data-bs-toggle="tooltip" data-bs-placement="top" title="Pdf"><img src="<?= ROOT?>/assets/img/icons/pdf.svg" alt="img"></a>
+                    <a data-bs-toggle="tooltip" data-bs-placement="top" title="Pdf"><img src="<?= ROOT ?>/assets/img/icons/pdf.svg" alt="img"></a>
                 </li>
                 <li>
-                    <a data-bs-toggle="tooltip" data-bs-placement="top" title="Excel"><img src="<?= ROOT?>/assets/img/icons/excel.svg" alt="img"></a>
+                    <a data-bs-toggle="tooltip" data-bs-placement="top" title="Excel"><img src="<?= ROOT ?>/assets/img/icons/excel.svg" alt="img"></a>
                 </li>
                 <li>
                     <a data-bs-toggle="tooltip" data-bs-placement="top" title="Print"><i data-feather="printer" class="feather-rotate-ccw"></i></a>
@@ -32,10 +32,16 @@
                         <div class="sales-details-items d-flex">
                             <div class="details-item">
                                 <h6>Information Client</h6>
-                                <p><?= $Ventedata->nomPrenom ?><br>
-                                    <?= $Ventedata->telephone ?><br>
-                                    <?= $Ventedata->typeClientFournisseur ?><br>
-                                </p>
+                                <?php if ($Ventedata->nomPrenom): ?>
+                                    <p><?= $Ventedata->nomPrenom ?><br>
+                                        <?= $Ventedata->telephone ?><br>
+                                        <?= $Ventedata->typeClientFournisseur ?><br>
+                                    </p>
+                                <?php else: ?>
+                                    <p>Client divers<br>
+                                        <?= $Ventedata->uuidClientFourniture ?><br>
+                                    </p>
+                                <?php endif ?>
                             </div>
                             <div class="details-item">
                                 <h6>Infomation du Boutique</h6>
@@ -72,18 +78,23 @@
                                         <th>Article</th>
                                         <th>Quantite</th>
                                         <th>Prix Unitaire</th>
-                                        <th>Prix Engros</th>
+                                        <?php if ($Ventedata->nomPrenom):?>
+                                            <th>Prix Engros</th>
+                                        <?php else :?>
+                                        <th>Prix Detaillants</th>
+                                        <?php endif ?>
+                                        
                                         <th>Montant</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($dataLigneVente as $article): ?>
                                         <tr>
-                                            <td><?=$article->nomArticle ?></td>
-                                            <td><?=$article->quantite ?></td>
-                                            <td><?=$article->prixUnitaireArticle ?></td>
-                                            <td><?=$article->prixEngrosArticle ?></td>
-                                            <td><?=$article->montant ?></td>
+                                            <td><?= $article->nomArticle ?></td>
+                                            <td><?= $article->quantite ?></td>
+                                            <td><?= $article->prixUnitaireArticle ?></td>
+                                            <td><?= $article->prix_Engros_Detaillant ?></td>
+                                            <td><?= $article->montant ?></td>
                                         </tr>
                                     <?php endforeach ?>
                                 </tbody>
